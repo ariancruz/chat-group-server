@@ -17,7 +17,7 @@ async function bootstrap() {
   );
 
   /*Compression*/
-  app.use(compression);
+  app.use(compression());
   /*Cors*/
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors({});
@@ -28,6 +28,7 @@ async function bootstrap() {
     .setTitle('Chat Group')
     .setDescription('The chat server group')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

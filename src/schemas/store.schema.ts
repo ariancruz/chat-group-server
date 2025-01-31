@@ -1,5 +1,6 @@
 import { HydratedDocument, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Groups } from './groups.schema';
 
 export type StoresDocument = HydratedDocument<Stores>;
 
@@ -9,13 +10,10 @@ export class Stores {
   name: string;
 
   @Prop({ required: true })
-  type: string;
+  data: string;
 
-  @Prop({ required: true })
-  mainPhoto: string;
-
-  @Prop({ required: true, type: Types.ObjectId, ref: 'searchconfig' })
-  searchConfigId: SearchConfig;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'group' })
+  group: Groups;
 }
 
 export const StoresSchema = SchemaFactory.createForClass(Stores);

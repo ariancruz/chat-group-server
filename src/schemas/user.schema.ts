@@ -19,9 +19,6 @@ export class Users {
 
   @Prop()
   refreshToken: string;
-
-  @Prop({ required: true })
-  enable: boolean;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

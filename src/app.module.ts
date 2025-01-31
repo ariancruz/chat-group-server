@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { StoreModule } from './store/store.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventType } from './enums';
-import { UserModule } from './user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { StoreModule } from './modules/store/store.module';
+import { EventsModule } from './modules/events/events.module';
 
 @Module({
   imports: [
@@ -17,10 +18,11 @@ import { UserModule } from './user/user.module';
         uri: configService.get<string>(EventType.MONGODB_URI),
       }),
     }),
-    StoreModule,
+    AuthModule,
     UserModule,
+    StoreModule,
+    EventsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
