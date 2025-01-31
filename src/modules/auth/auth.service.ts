@@ -8,7 +8,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EventType } from '../../enums';
-import { DecodeUser, Refresh, ReqRefresh } from '../../models';
+import { CreateUserDto, DecodeUser, Refresh, ReqRefresh } from '../../models';
 import { UserDocument } from '../../schemas/user.schema';
 
 @Injectable()
@@ -81,6 +81,10 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException();
     }
+  }
+
+  async register(user: CreateUserDto) {
+    return this.usersService.create(user);
   }
 
   private async generatedTokens(user: UserDocument): Promise<Refresh> {

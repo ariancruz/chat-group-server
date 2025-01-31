@@ -17,6 +17,7 @@ import {
 import { Public } from '../../decorators/public.decorator';
 import { User } from '../../decorators/user.decorator';
 import {
+  CreateUserDto,
   DecodeUser,
   LoginCredentialsDto,
   RefreshDto,
@@ -50,6 +51,13 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   logout(@User() user: DecodeUser) {
     return this.authService.logout(user);
+  }
+
+  @Public()
+  @Post('register')
+  @ApiResponse({ status: 200, type: UserAuthenticatedDto })
+  register(@Body() user: CreateUserDto) {
+    return this.authService.register(user);
   }
 
   @Put('refresh')
