@@ -14,7 +14,7 @@ import { CreateGroupDto, DecodeUser, UpdateGroupDto } from '../../models';
 import { User } from '../../decorators/user.decorator';
 import { ApiBearerAuth, ApiProduces, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Auth')
+@ApiTags('Groups')
 @ApiBearerAuth()
 @Controller('groups')
 @ApiProduces('application/json')

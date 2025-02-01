@@ -6,7 +6,7 @@ export class LoginCredentialsDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ default: 'admin123*' })
+  @ApiProperty({ default: '123456' })
   password: string;
 }
 

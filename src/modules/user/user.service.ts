@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { createHash } from 'crypto';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserDocument, Users } from '../../schemas/user.schema';
+import { UserDocument, Users } from '../../schemas/users.schema';
 import {
   CreateUserDto,
   DecodeUser,

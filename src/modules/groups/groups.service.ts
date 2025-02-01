@@ -33,11 +33,12 @@ export class GroupsService {
 
   update(id: string, updateGroupDto: UpdateGroupDto, user: DecodeUser) {
     const { _id: userId } = user;
-    const { _id, ...updateDto } = updateGroupDto;
+    const { users, name } = updateGroupDto;
     return this.groupModel
       .findOneAndUpdate(
         { _id: new Types.ObjectId(id), users: { $in: [userId] } },
-        updateDto,
+        { users, name },
+        { new: true },
       )
       .exec();
   }
@@ -53,5 +54,15 @@ export class GroupsService {
     if (group && group.users.length === 0) {
       return this.groupModel.findByIdAndDelete(idGroup);
     }
+  }
+
+  isInGroup(groupId: string, userId: string) {
+    return this.groupModel
+      .findOne({
+        _id: new Types.ObjectId(groupId),
+        users: { $in: [userId] },
+      })
+      .exec()
+      .then((g) => !!g);
   }
 }

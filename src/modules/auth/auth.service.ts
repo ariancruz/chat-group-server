@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EventType } from '../../enums';
 import { CreateUserDto, DecodeUser, Refresh, ReqRefresh } from '../../models';
-import { UserDocument } from '../../schemas/user.schema';
+import { UserDocument } from '../../schemas/users.schema';
 
 @Injectable()
 export class AuthService {
