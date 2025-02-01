@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Schema as SchemaM, Types } from 'mongoose';
 import { Users } from './user.schema';
 
 export type GroupsDocument = HydratedDocument<Groups>;
@@ -12,8 +12,11 @@ export class Groups {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true, type: Types.Array<Types.ObjectId>, ref: 'user' })
-  userId: Users[];
+  @Prop({
+    required: true,
+    type: [{ type: SchemaM.Types.ObjectId, ref: 'Users' }],
+  })
+  users: Users[];
 }
 
 export const GroupsSchema = SchemaFactory.createForClass(Groups);

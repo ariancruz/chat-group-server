@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { StoreModule } from './modules/store/store.module';
 import { EventsModule } from './modules/events/events.module';
+import { GroupsModule } from './modules/groups/groups.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { EventsModule } from './modules/events/events.module';
     UserModule,
     StoreModule,
     EventsModule,
+    GroupsModule,
   ],
   controllers: [AppController],
 })
