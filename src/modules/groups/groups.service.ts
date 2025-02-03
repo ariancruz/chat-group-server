@@ -2,17 +2,34 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Groups } from '../../schemas/groups.schema';
-import { CreateGroupDto, DecodeUser, UpdateGroupDto } from '../../models';
+import {
+  CreateGroupDto,
+  DecodeUser,
+  GroupLight,
+  UpdateGroupDto,
+} from '../../models';
+import { EventsGateway } from '../events/events.gateway';
+import { EventGroup } from '../../enums';
 
 @Injectable()
 export class GroupsService {
-  constructor(@InjectModel(Groups.name) private groupModel: Model<Groups>) {}
+  constructor(
+    @InjectModel(Groups.name) private groupModel: Model<Groups>,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
-  create(createGroupDto: CreateGroupDto) {
-    return new this.groupModel({
-      ...createGroupDto,
-      _id: new Types.ObjectId(),
-    }).save();
+  async create(createGroupDto: CreateGroupDto, userReq: DecodeUser) {
+    const { users, name } = createGroupDto;
+    const { _id: owner } = userReq;
+    const _id = new Types.ObjectId();
+    const group = await new this.groupModel({ ...createGroupDto, _id }).save();
+
+    this.notifyUsers(
+      EventGroup.ADD_GROUP,
+      users.filter((f) => f !== owner),
+      { _id, name },
+    );
+    return group;
   }
 
   findAll(user: DecodeUser) {
@@ -26,21 +43,28 @@ export class GroupsService {
   findOne(id: string, user: DecodeUser) {
     const { _id } = user;
     return this.groupModel
-      .find({ _id: new Types.ObjectId(id), users: { $in: [_id] } })
+      .findOne({ _id: new Types.ObjectId(id), users: { $in: [_id] } })
       .populate('users', ['name', 'email'])
       .exec();
   }
 
-  update(id: string, updateGroupDto: UpdateGroupDto, user: DecodeUser) {
+  async update(id: string, updateGroupDto: UpdateGroupDto, user: DecodeUser) {
     const { _id: userId } = user;
     const { users, name } = updateGroupDto;
-    return this.groupModel
+    const group = await this.groupModel
       .findOneAndUpdate(
         { _id: new Types.ObjectId(id), users: { $in: [userId] } },
         { users, name },
         { new: true },
       )
       .exec();
+    this.notifyUsers(
+      EventGroup.UPDATE_GROUP,
+      users.filter((f) => f !== userId),
+      { _id: id, name },
+    );
+
+    return group;
   }
 
   async remove(id: string, user: DecodeUser) {
@@ -56,13 +80,20 @@ export class GroupsService {
     }
   }
 
-  isInGroup(groupId: string, userId: string) {
-    return this.groupModel
+  async isInGroup(groupId: string, userId: string) {
+    const g = await this.groupModel
       .findOne({
         _id: new Types.ObjectId(groupId),
         users: { $in: [userId] },
       })
-      .exec()
-      .then((g) => !!g);
+      .exec();
+    return !!g;
+  }
+
+  private notifyUsers(event: EventGroup, users: string[], data: GroupLight) {
+    users.forEach((user) => {
+      const channel = user + ':' + event;
+      this.eventsGateway.sendNotify(channel, data);
+    });
   }
 }

@@ -4,6 +4,7 @@ import { CommentsController } from './comments.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Comments, CommentsSchema } from '../../schemas/comments.schema';
 import { GroupsModule } from '../groups/groups.module';
+import { GeminiService } from './gemini.service';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { GroupsModule } from '../groups/groups.module';
     GroupsModule,
   ],
   controllers: [CommentsController],
-  providers: [CommentsService],
+  providers: [CommentsService, GeminiService],
 })
 export class CommentsModule {}

@@ -5,18 +5,34 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Comments } from '../../schemas/comments.schema';
 import { GroupsService } from '../groups/groups.service';
+import { GeminiService } from './gemini.service';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectModel(Comments.name) private commentsModel: Model<Comments>,
     private groupsService: GroupsService,
+    private geminiService: GeminiService,
   ) {}
 
   async create(createCommentDto: CreateCommentDto, user: DecodeUser) {
     const { _id, name } = user;
-    const { group, data } = createCommentDto;
+    const { group, data, ia } = createCommentDto;
     if (await this.checkUserAllow(group, user)) {
+      if (ia) {
+        this.geminiService
+          .generateText(data)
+          .then((result) => {
+            return new this.commentsModel({
+              _id: new Types.ObjectId(),
+              name: 'Gemini',
+              user: new Types.ObjectId(),
+              data: result,
+              group: new Types.ObjectId(group),
+            }).save();
+          })
+          .then((ws) => console.log(ws));
+      }
       return new this.commentsModel({
         _id: new Types.ObjectId(),
         name,

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 export class CreateCommentDto {
   @ApiProperty()
@@ -6,9 +6,12 @@ export class CreateCommentDto {
 
   @ApiProperty()
   group: string;
+
+  @ApiProperty({ required: false })
+  ia: boolean;
 }
 
-export class UpdateCommentDto extends CreateCommentDto {
+export class UpdateCommentDto extends OmitType(CreateCommentDto, ['ia']) {
   @ApiProperty()
   _id: string;
 

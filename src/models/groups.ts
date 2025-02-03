@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 export class CreateGroupDto {
   @ApiProperty()
@@ -11,4 +12,9 @@ export class CreateGroupDto {
 export class UpdateGroupDto extends CreateGroupDto {
   @ApiProperty()
   _id: string;
+}
+
+export interface GroupLight {
+  _id: string | Types.ObjectId;
+  name: string;
 }
