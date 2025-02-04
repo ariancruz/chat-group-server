@@ -32,7 +32,7 @@ export class UserService {
   }
 
   async findAll(): Promise<UserDocument[]> {
-    return this.userModel.find().select(['-password', '-refreshToken']).exec();
+    return this.userModel.find().select(['name']).exec();
   }
 
   async create(data: CreateUserDto): Promise<Omit<Users, 'password'>> {

@@ -3,7 +3,8 @@ export enum EventType {
   TOKEN_SECRET = 'TOKEN_SECRET',
 }
 
-export enum EventGroup {
+export enum EventsWs {
   ADD_GROUP = 'addGroup',
   UPDATE_GROUP = 'updateGroup',
+  NEW_COMMENT = 'newComment',
 }

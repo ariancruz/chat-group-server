@@ -9,7 +9,7 @@ import {
   UpdateGroupDto,
 } from '../../models';
 import { EventsGateway } from '../events/events.gateway';
-import { EventGroup } from '../../enums';
+import { EventsWs } from '../../enums';
 
 @Injectable()
 export class GroupsService {
@@ -25,7 +25,7 @@ export class GroupsService {
     const group = await new this.groupModel({ ...createGroupDto, _id }).save();
 
     this.notifyUsers(
-      EventGroup.ADD_GROUP,
+      EventsWs.ADD_GROUP,
       users.filter((f) => f !== owner),
       { _id, name },
     );
@@ -59,7 +59,7 @@ export class GroupsService {
       )
       .exec();
     this.notifyUsers(
-      EventGroup.UPDATE_GROUP,
+      EventsWs.UPDATE_GROUP,
       users.filter((f) => f !== userId),
       { _id: id, name },
     );
@@ -90,7 +90,7 @@ export class GroupsService {
     return !!g;
   }
 
-  private notifyUsers(event: EventGroup, users: string[], data: GroupLight) {
+  private notifyUsers(event: EventsWs, users: string[], data: GroupLight) {
     users.forEach((user) => {
       const channel = user + ':' + event;
       this.eventsGateway.sendNotify(channel, data);

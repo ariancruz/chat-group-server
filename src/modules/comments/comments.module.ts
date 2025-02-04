@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Comments, CommentsSchema } from '../../schemas/comments.schema';
 import { GroupsModule } from '../groups/groups.module';
 import { GeminiService } from './gemini.service';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GeminiService } from './gemini.service';
       { name: Comments.name, schema: CommentsSchema },
     ]),
     GroupsModule,
+    EventsModule,
   ],
   controllers: [CommentsController],
   providers: [CommentsService, GeminiService],

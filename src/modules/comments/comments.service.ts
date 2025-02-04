@@ -6,6 +6,8 @@ import { Model, Types } from 'mongoose';
 import { Comments } from '../../schemas/comments.schema';
 import { GroupsService } from '../groups/groups.service';
 import { GeminiService } from './gemini.service';
+import { EventsGateway } from '../events/events.gateway';
+import { EventsWs } from '../../enums';
 
 @Injectable()
 export class CommentsService {
@@ -13,6 +15,7 @@ export class CommentsService {
     @InjectModel(Comments.name) private commentsModel: Model<Comments>,
     private groupsService: GroupsService,
     private geminiService: GeminiService,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   async create(createCommentDto: CreateCommentDto, user: DecodeUser) {
@@ -31,7 +34,11 @@ export class CommentsService {
               group: new Types.ObjectId(group),
             }).save();
           })
-          .then((ws) => console.log(ws));
+          .then((ws) => {
+            const comment = ws?.toObject();
+            const channel = group + ':' + EventsWs.NEW_COMMENT;
+            this.eventsGateway.sendNotify(channel, comment);
+          });
       }
       return new this.commentsModel({
         _id: new Types.ObjectId(),
