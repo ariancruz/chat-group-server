@@ -10,6 +10,7 @@ import {
 } from '../../models';
 import { EventsGateway } from '../events/events.gateway';
 import { EventsWs } from '../../enums';
+import { difference } from 'lodash';
 
 @Injectable()
 export class GroupsService {
@@ -52,19 +53,23 @@ export class GroupsService {
     const { _id: userId } = user;
     const { users, name } = updateGroupDto;
     const group = await this.groupModel
-      .findOneAndUpdate(
-        { _id: new Types.ObjectId(id), users: { $in: [userId] } },
-        { users, name },
-        { new: true },
-      )
+      .findOne({ _id: new Types.ObjectId(id), users: { $in: [userId] } })
       .exec();
-    this.notifyUsers(
-      EventsWs.UPDATE_GROUP,
-      users.filter((f) => f !== userId),
-      { _id: id, name },
-    );
+    if (group) {
+      const userRaw: object[] = group?.toJSON()['users'] || [];
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      const actual = userRaw.map((u) => u.toString());
 
-    return group;
+      const newUser = difference(users, actual);
+      const removedUser = difference(actual, users);
+      const updateUser = difference(actual, [...newUser, ...removedUser]);
+
+      this.notifyUsers(EventsWs.ADD_GROUP, newUser, { _id: id, name });
+      this.notifyUsers(EventsWs.UPDATE_GROUP, updateUser, { _id: id, name });
+      this.notifyUsers(EventsWs.REMOVED_GROUP, removedUser, { _id: id });
+
+      await group?.updateOne({ name, users }).exec();
+    }
   }
 
   async remove(id: string, user: DecodeUser) {
@@ -90,7 +95,7 @@ export class GroupsService {
     return !!g;
   }
 
-  private notifyUsers(event: EventsWs, users: string[], data: GroupLight) {
+  notifyUsers(event: EventsWs, users: string[], data: Partial<GroupLight>) {
     users.forEach((user) => {
       const channel = user + ':' + event;
       this.eventsGateway.sendNotify(channel, data);

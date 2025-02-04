@@ -22,6 +22,7 @@ export class CommentsService {
     const { _id, name } = user;
     const { group, data, ia } = createCommentDto;
     const channelIa = group + ':' + EventsWs.IA_LOADING;
+    const channel = group + ':' + EventsWs.NEW_COMMENT;
 
     if (await this.checkUserAllow(group, user)) {
       if (ia) {
@@ -41,17 +42,20 @@ export class CommentsService {
             this.eventsGateway.sendNotify(channelIa, { status: false });
 
             const comment = ws?.toObject();
-            const channel = group + ':' + EventsWs.NEW_COMMENT;
             this.eventsGateway.sendNotify(channel, comment);
           });
       }
-      return new this.commentsModel({
+      const msg = await new this.commentsModel({
         _id: new Types.ObjectId(),
         name,
         user: new Types.ObjectId(_id),
         data,
         group: new Types.ObjectId(group),
       }).save();
+
+      this.eventsGateway.sendNotify(channel, msg?.toJSON());
+
+      return msg;
     }
   }
 
