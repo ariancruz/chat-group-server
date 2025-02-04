@@ -21,8 +21,11 @@ export class CommentsService {
   async create(createCommentDto: CreateCommentDto, user: DecodeUser) {
     const { _id, name } = user;
     const { group, data, ia } = createCommentDto;
+    const channelIa = group + ':' + EventsWs.IA_LOADING;
+
     if (await this.checkUserAllow(group, user)) {
       if (ia) {
+        this.eventsGateway.sendNotify(channelIa, { status: true });
         this.geminiService
           .generateText(data)
           .then((result) => {
@@ -35,6 +38,8 @@ export class CommentsService {
             }).save();
           })
           .then((ws) => {
+            this.eventsGateway.sendNotify(channelIa, { status: false });
+
             const comment = ws?.toObject();
             const channel = group + ':' + EventsWs.NEW_COMMENT;
             this.eventsGateway.sendNotify(channel, comment);
