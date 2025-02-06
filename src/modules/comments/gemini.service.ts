@@ -8,7 +8,7 @@ export class GeminiService {
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY as string;
-    const model = process.env.GEMINI_MODEL as string;
+    const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
 
     this.gemini = new GoogleGenerativeAI(apiKey);
     this.model = this.gemini.getGenerativeModel({ model });
