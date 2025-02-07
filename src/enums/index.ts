@@ -11,4 +11,5 @@ export enum EventsWs {
   NEW_COMMENT = 'newComment',
 
   IA_LOADING = 'loadingIa',
+  TYPING = 'typing',
 }
